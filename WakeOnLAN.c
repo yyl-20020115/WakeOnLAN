@@ -42,6 +42,7 @@
 	#include <winsock2.h>
 	#include <windows.h>
 	#include <ws2tcpip.h>
+	#include <getopt.h>
 	#pragma comment(lib, "Ws2_32.lib")
 #endif
 #ifdef __APPLE__
@@ -102,7 +103,7 @@ void createMagicPacket(unsigned char packet[], unsigned int macAddress[]){
  */
 static int sendMagicPacket(const unsigned char *packet,
 						   const char *broadcastAddress,
-						   const char* interface) {
+						   const char* _interface) {
 	// Socket address
 	struct sockaddr_in udpClient, udpServer;
 
@@ -118,6 +119,7 @@ static int sendMagicPacket(const unsigned char *packet,
 	} else {
 		broadcastAddress = "255.255.255.255";
 	}
+	int broadcast = 1;
 
 	// MacOS and Linux
 	#if defined(__APPLE__) || defined(__linux)
@@ -128,7 +130,6 @@ static int sendMagicPacket(const unsigned char *packet,
 		}
 
 		// To enable the datagram socket to send broadcast packet
-		int broadcast = 1;
 		int setsock_result = setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof broadcast);
 		if (setsock_result == -1) {
 			printf("Failed to set socket options: '%s'.\n", strerror(errno));
