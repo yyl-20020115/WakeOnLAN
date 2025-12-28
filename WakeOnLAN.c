@@ -323,13 +323,7 @@ int main(int argc, char* argv[]){
 			printf("Failed to allocate memory for mac address.\n");
 			exit(EXIT_FAILURE);
 		}
-		//unsigned int ip[4] = { 0 };
-		//i = sscanf(argv[1], "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
-		//if (i == 4) {
-		//	 
-		//}
-		//else {
-		//}
+
 		// Parse Mac Address
 		i = sscanf(argv[1],"%x:%x:%x:%x:%x:%x", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
 		if(i != 6) {
