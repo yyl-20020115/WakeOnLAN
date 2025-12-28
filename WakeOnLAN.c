@@ -74,11 +74,11 @@
  * @param packet Where to store the created magic packet.
  * @param macAddress The mac address to send the magic packet to.
  */
-void createMagicPacket(unsigned char packet[], unsigned int macAddress[]){
+static void CreateMagicPacket(unsigned char packet[], unsigned int macAddress[]){
 	int i;
 
 	// Mac Address Variable
-	unsigned char mac[6];
+	unsigned char mac[6] = { 0 };
 
 	// 6 x 0xFF at start of packet
 	for(i = 0; i < 6; i++){
@@ -101,7 +101,7 @@ void createMagicPacket(unsigned char packet[], unsigned int macAddress[]){
  * 
  * @return 0 on success, 1 on failure.
  */
-static int sendMagicPacket(const unsigned char *packet,
+static int SendMagicPacket(const unsigned char *packet,
 						   const char *broadcastAddress,
 						   const char* _interface) {
 	// Socket address
@@ -174,7 +174,7 @@ static int sendMagicPacket(const unsigned char *packet,
 	// Windows socket
 	#ifdef _WIN32
 		// Socket data
-		WSADATA data;
+		WSADATA data = { 0 };
 
 		// Socket
 		SOCKET udpSocket;
@@ -216,7 +216,7 @@ static int sendMagicPacket(const unsigned char *packet,
  *
  * @return 0 on success, 1 on failure
  */
-static int getMacAddressesFromFile(const char *filename, unsigned int ***mac_addresses_list, int *mac_addresses_count) {
+static int GetMacAddressesFromFile(const char *filename, unsigned int ***mac_addresses_list, int *mac_addresses_count) {
 	FILE *file = fopen(filename, "r");
     if (file == NULL) {
         printf("Could not open file %s\n", filename);
@@ -290,7 +290,7 @@ int main(int argc, char* argv[]){
 
 	// If no arguments given, print usage
 	if(argc < 2){
-		printf("Usage:\n%s [<mac address> | -f macs-list.txt] [<broadcast address>]", argv[0]);
+		printf("Usage:\n%s [<ip>|<mac address> | -f macs-list.txt] [<broadcast address>]", argv[0]);
 		#ifndef _WIN32
 			printf(" [<interface>]");
 		#endif
@@ -311,7 +311,7 @@ int main(int argc, char* argv[]){
     if (file_name) {
         printf("Parsing file name: %s . Invalid MAC addresses will be discarded.\n", file_name);
 
-		error = getMacAddressesFromFile(file_name, &mac_addresses_list, &mac_addresses_count);
+		error = GetMacAddressesFromFile(file_name, &mac_addresses_list, &mac_addresses_count);
 		if (error)
 		{
 			printf("Failed to read MAC addresses from file.\n");
@@ -323,10 +323,18 @@ int main(int argc, char* argv[]){
 			printf("Failed to allocate memory for mac address.\n");
 			exit(EXIT_FAILURE);
 		}
-
+		//unsigned int ip[4] = { 0 };
+		//i = sscanf(argv[1], "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
+		//if (i == 4) {
+		//	 
+		//}
+		//else {
+		//}
 		// Parse Mac Address
 		i = sscanf(argv[1],"%x:%x:%x:%x:%x:%x", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
 		if(i != 6) {
+
+
 			printf("Invalid mac address. Please specify a valid mac address in the format xx:xx:xx:xx:xx:xx\n");
 			free(mac);
 			exit(EXIT_FAILURE);
@@ -357,9 +365,9 @@ int main(int argc, char* argv[]){
 	for(i = 0; i < mac_addresses_count; i++) {
 		unsigned int *mac = mac_addresses_list[i];
 
-		createMagicPacket(packet, mac);
+		CreateMagicPacket(packet, mac);
 
-		error = sendMagicPacket(packet, broadcast ? broadcastAddress : NULL, argc > 3 ? argv[3] : NULL);
+		error = SendMagicPacket(packet, broadcast ? broadcastAddress : NULL, argc > 3 ? argv[3] : NULL);
 		if(error) {
 			printf("Failed to send magic packet.\n");
 			exit(EXIT_FAILURE);
@@ -374,5 +382,6 @@ free_and_exit:
 	}
 	free(mac_addresses_list);
 
-	exit(EXIT_SUCCESS);
+	//exit(EXIT_SUCCESS);
+	return 0;
 }
